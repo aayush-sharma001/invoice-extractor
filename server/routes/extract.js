@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import pdfParse from 'pdf-parse';
 import fetch from 'node-fetch';
 import Tesseract from 'tesseract.js';
 import { createWorker } from 'tesseract.js';
@@ -12,9 +13,9 @@ const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png'];
+    const allowedTypes = ['image/jpeg', 'image/png', "application/pdf"];
     if (!allowedTypes.includes(file.mimetype)) {
-      return cb(new Error('Only JPG and PNG files are allowed.'));
+      return cb(new Error('Only JPG, PNG and PDF files are allowed.'));
     }
     cb(null, true);
   }
@@ -35,7 +36,13 @@ router.post('/', upload.single('extract'), async (req, res) => {
       return res.status(400).json({ success: false, error: 'No file uploaded.' });
     }
 
-    const extractedText = await extractTextFromBuffer(req.file.buffer);
+    let extractedText = '';
+    if (req.file.mimetype === 'application/pdf') {
+      const pdfData = await pdfParse(req.file.buffer);
+      extractedText = pdfData.text;
+    } else {
+      extractedText = await extractTextFromBuffer(req.file.buffer);
+    }
     const prompt = generatePrompt(extractedText);
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import UploadBox from './components/UploadBox';
 import ResultCard from './components/ResultCard';
 
-const BASE_URL = 'https://invoice-extractor-1lg8.onrender.com'
+const BASE_URL = 'https://invoice-extractor-1lg8.onrender.com';
 
 function App() {
   const [file, setFile] = useState(null);
