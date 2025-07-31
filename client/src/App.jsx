@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import UploadBox from './components/UploadBox';
 import ResultCard from './components/ResultCard';
 
+const BASE_URL = 'https://invoice-extractor-1lg8.onrender.com'
+
 function App() {
   const [file, setFile] = useState(null);
   const [results, setResults] = useState(null);
@@ -29,7 +31,7 @@ function App() {
     formData.append("extract", file);
 
     try {
-      const res = await fetch('http://localhost:5000/api/extract', {
+      const res = await fetch(`${BASE_URL}/api/extract`, {
         method: 'POST',
         body: formData,
       });
