@@ -4,10 +4,11 @@ import { FaFileUpload } from "react-icons/fa";
 function UploadBox({ onFileSelect }) {
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef();
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (fileOrEvent) => {
+    const file = fileOrEvent.target?.files?.[0] || fileOrEvent;
     if (file) {
       onFileSelect(file);
       setFileName(file.name);
@@ -22,8 +23,31 @@ function UploadBox({ onFileSelect }) {
     }
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    handleFileChange(file);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-6 rounded-lg bg-white shadow w-full max-w-lg">
+    <div 
+      className={`flex flex-col items-center justify-center border-2 border-dashed ${
+        isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+      } p-6 rounded-lg bg-white shadow w-full max-w-lg`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <label
         htmlFor="fileInput"
         className="flex flex-col items-center gap-3 cursor-pointer"
